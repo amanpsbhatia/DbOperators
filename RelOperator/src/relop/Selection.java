@@ -7,11 +7,23 @@ package relop;
  */
 public class Selection extends Iterator {
 
+	private Iterator iterator;
+	private Predicate[] predicates;
+
+	// boolean variable to indicate whether the pre-fetched tuple is consumed or not
+	private boolean nextTupleIsConsumed;
+	
+	// pre-fetched tuple
+	private Tuple nextTuple;
+	
   /**
    * Constructs a selection, given the underlying iterator and predicates.
    */
-  public Selection(Iterator iter, Predicate... preds) {
-    throw new UnsupportedOperationException("Not implemented");
+  public Selection(Iterator iter, Predicate... preds) {	  
+	  this.iterator = iter;
+	  this.predicates = preds;
+	  nextTuple = null;
+	  nextTupleIsConsumed = true;
   }
 
   /**
@@ -19,35 +31,50 @@ public class Selection extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
+//    TODO : Not sure what to do here?
+	  throw new UnsupportedOperationException("Not implemented");
   }
 
   /**
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    throw new UnsupportedOperationException("Not implemented");
+	  iterator.restart();
+	  nextTuple = null;
+	  nextTupleIsConsumed = true;
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    throw new UnsupportedOperationException("Not implemented");
+    return iterator.isOpen();
   }
 
   /**
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    throw new UnsupportedOperationException("Not implemented");
+	  iterator.close();
   }
 
   /**
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    throw new UnsupportedOperationException("Not implemented");
+	  if (!nextTupleIsConsumed)
+			return true;
+
+	  while(iterator.hasNext()){
+		  nextTuple = iterator.getNext();
+		  for (int i = 0; i < predicates.length; i++){
+				if (predicates[i].evaluate(nextTuple)) {
+					nextTupleIsConsumed = false;
+					return true;
+				}		
+		  }
+	  }
+	  return false;
   }
 
   /**
@@ -56,7 +83,11 @@ public class Selection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    throw new UnsupportedOperationException("Not implemented");
+	  if (!nextTupleIsConsumed || hasNext()){
+		  nextTupleIsConsumed = true;
+		  return nextTuple;
+	  }
+	  throw new IllegalStateException("No more tuples");
   }
 
 } // public class Selection extends Iterator
