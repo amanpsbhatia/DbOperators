@@ -8,7 +8,6 @@ public class Projection extends Iterator {
 
 	  private Iterator iterator;
 	  private Integer[] fields;
-	  private Schema newSchema;
 	  
   /**
    * Constructs a projection, given the underlying iterator and field numbers.
@@ -16,12 +15,13 @@ public class Projection extends Iterator {
   public Projection(Iterator iter, Integer... fields) {
 	  this.iterator = iter;
 	  this.fields = fields;
-	  newSchema = new Schema(fields.length);
+	  schema = new Schema(fields.length);
 	  Schema oldSchema = iter.schema;
 	  for (int i=0; i<fields.length; i++ ){
 		  int fieldId = fields[i];
-		  newSchema.initField(i, oldSchema, fieldId);
+		  schema.initField(i, oldSchema, fieldId);
 	  }
+	  
   }
 
   /**
@@ -70,7 +70,7 @@ public class Projection extends Iterator {
   public Tuple getNext()throws IllegalStateException {
 	  Tuple tuple, newTuple;	  
 	  tuple = iterator.getNext();
-	  newTuple = new Tuple(newSchema);
+	  newTuple = new Tuple(schema);
 	  for (int i=0; i<fields.length; i++ ){
 		  newTuple.setField(i, tuple.getField(fields[i]));
 	  }

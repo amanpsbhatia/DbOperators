@@ -20,6 +20,8 @@ public class Selection extends Iterator {
    * Constructs a selection, given the underlying iterator and predicates.
    */
   public Selection(Iterator iter, Predicate... preds) {	  
+	  super();
+	  this.schema = iter.schema;
 	  this.iterator = iter;
 	  this.predicates = preds;
 	  nextTuple = null;
