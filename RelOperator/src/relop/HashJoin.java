@@ -11,6 +11,7 @@ import index.HashIndex;
 
 public class HashJoin extends Iterator {
 
+	private static int DEFAULAT_HASH_VALUE = -1;
 	private Iterator outer;
 	private Iterator inner;
 	private HeapFile outerTempFile;
@@ -44,18 +45,26 @@ public class HashJoin extends Iterator {
 
 		prepareOuterIndexScan();
 		prepareInnerIndexScan();		
-		currentHash = -1;
-		loadNextBucket();
+		currentHash = DEFAULAT_HASH_VALUE;
+		try {
+			loadNextBucket();
+		} catch (IllegalStateException e) {
+			// The outer hash is empty
+			
+		}
+		
 		nextTupleIsConsumed = true;		
 		
 	}
 	
 	private void loadNextBucket()throws IllegalStateException{
-		
+				
+		while(outerScan.hasNext() && outerScan.getNextHash() == currentHash){
+			outerScan.getNext();
+		}		
 		if (!outerScan.hasNext()){
 			throw new IllegalStateException("No more elements present to read");
 		}
-		
 		currentHash = outerScan.getNextHash();
 		hashTable = new HashTableDup();
 		
@@ -144,8 +153,12 @@ public class HashJoin extends Iterator {
 		close();
 		prepareOuterIndexScan();
 		prepareInnerIndexScan();		
-		
-		loadNextBucket();		
+		try {
+			loadNextBucket();
+		} catch (IllegalStateException e) {
+			// The outer hash is empty
+			
+		}		
 	}
 
 	@Override
@@ -217,7 +230,7 @@ public class HashJoin extends Iterator {
 		}
 		
 		while(innerScan.hasNext()){
-			int nextHash = innerScan.getNextHash();
+			int nextHash = innerScan.getNextHash();			
 			if (nextHash == currentHash){
 				//Same bucket
 				innerTuple = innerScan.getNext();
