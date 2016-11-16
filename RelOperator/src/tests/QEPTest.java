@@ -84,16 +84,22 @@ public class QEPTest extends TestDriver {
 		s_department.initField(3, AttrType.FLOAT, 10, "MaxSalary");
 		
 		//Populate Employee and Department Data
-		qep.populateTables(folderLocation);
-		
-		// run all the test cases
-		System.out.println("\n" + "Running " + TEST_NAME + " .....");
+		boolean isDataPopulated = qep.populateTables(folderLocation);
 		
 		boolean status = PASS;
-		status &= qep.test1();
-		status &= qep.test2();
-		status &= qep.test3();
-		status &= qep.test4();
+		if (isDataPopulated){
+			// run all the test cases
+			System.out.println("\n" + "Running " + TEST_NAME + " .....");
+			
+			
+			status &= qep.test1();
+			status &= qep.test2();
+			status &= qep.test3();
+			status &= qep.test4();
+		}
+		else {
+			status = FAIL;
+		}
 		
 		// display final results
 		System.out.println();
@@ -113,15 +119,21 @@ public class QEPTest extends TestDriver {
 	protected boolean test1() {
 		
 		System.out.println("\n Test 1 : Display for each employee his ID, Name and Age");
-		
-		saveCounts(null);
-		FileScan scan = new FileScan(s_employee, employee);
-		Projection pro = new Projection(scan, 0,1,2);
-		pro.execute();
-		saveCounts("qep-test1");
-		
-		System.out.println("\n\nTest 1 completed without exception");
-		return PASS;
+		boolean status = PASS;
+		try{
+			saveCounts(null);
+			FileScan scan = new FileScan(s_employee, employee);
+			Projection pro = new Projection(scan, 0,1,2);
+			pro.execute();
+			saveCounts("qep-test1");
+			
+			System.out.println("\n\nTest 1 completed without exception");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			status = FAIL;
+		}
+		return status;
 	}
 	
 	/**
@@ -131,16 +143,23 @@ public class QEPTest extends TestDriver {
 	protected boolean test2(){
 		
 		System.out.println("\n Test 2 : Display the Name for the departments with MinSalary = MaxSalary");
-		saveCounts(null);
-		Predicate preds = new Predicate(AttrOperator.EQ, AttrType.FIELDNO, 2, AttrType.FIELDNO, 3);
-		FileScan scan = new FileScan(s_department, department);
-		Selection sel = new Selection(scan, preds);
-		Projection pro = new Projection(sel, 1);
-		pro.execute();
-		saveCounts("qep-test2");
-		
-		System.out.println("\n\nTest 2 completed without exception");
-		return PASS;
+		boolean status = PASS;
+		try{
+			saveCounts(null);
+			Predicate preds = new Predicate(AttrOperator.EQ, AttrType.FIELDNO, 2, AttrType.FIELDNO, 3);
+			FileScan scan = new FileScan(s_department, department);
+			Selection sel = new Selection(scan, preds);
+			Projection pro = new Projection(sel, 1);
+			pro.execute();
+			saveCounts("qep-test2");
+			
+			System.out.println("\n\nTest 2 completed without exception");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			status = FAIL;
+		}
+		return status;
 	}
 	
 	/**
@@ -151,15 +170,23 @@ public class QEPTest extends TestDriver {
 	protected boolean test3(){
 		
 		System.out.println("\n Test 3 : For each employee, display his Name and the Name of his department as well as the maximum salary of his department");
-		saveCounts(null);
 		
-		HashJoin join = new HashJoin(new FileScan(s_employee, employee), new IndexScan(s_department, ixdeptId, department), 4,5);
-		Projection pro = new Projection(join, 1,6,8);
-		pro.execute();
-		saveCounts("qep-test3");
-		
-		System.out.println("\n\nTest 3 completed without exception");
-		return PASS;
+		boolean status = PASS;
+		try {
+			saveCounts(null);
+			
+			HashJoin join = new HashJoin(new FileScan(s_employee, employee), new IndexScan(s_department, ixdeptId, department), 4,5);
+			Projection pro = new Projection(join, 1,6,8);
+			pro.execute();
+			saveCounts("qep-test3");
+			
+			System.out.println("\n\nTest 3 completed without exception");
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			status = FAIL;
+		}
+		return status;
 	}
 	
 	/**
@@ -170,19 +197,29 @@ public class QEPTest extends TestDriver {
 	protected boolean test4() {
 		
 		System.out.println("\n Test 4 : Display the Name for each employee whose Salary is greater than the maximum salary of his department.");
-		saveCounts(null);
 		
-		HashJoin join = new HashJoin(new FileScan(s_employee, employee), new IndexScan(s_department, ixdeptId, department), 4,5);
-		Selection sel = new Selection(join, new Predicate(AttrOperator.GT, AttrType.FIELDNO, 3, AttrType.FIELDNO, 8));
-		Projection pro = new Projection(sel, 1);
-		pro.execute();
-		saveCounts("qep-test4");
-
-		return PASS;
+		boolean status = PASS;
+		try {
+			saveCounts(null);
+			
+			HashJoin join = new HashJoin(new FileScan(s_employee, employee), new IndexScan(s_department, ixdeptId, department), 4,5);
+			Selection sel = new Selection(join, new Predicate(AttrOperator.GT, AttrType.FIELDNO, 3, AttrType.FIELDNO, 8));
+			Projection pro = new Projection(sel, 1);
+			pro.execute();
+			saveCounts("qep-test4");
+			
+			System.out.println("\n\nTest 4 completed without exception");
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			status = FAIL;
+		}
+		return status;
 	}
 	
-	public void populateTables(String folderLocation){
+	public boolean populateTables(String folderLocation){
 		
+		boolean isSuccess = true;
 		System.out.println("Folder Location : " + folderLocation);
 		initCounts();
 		
@@ -217,6 +254,7 @@ public class QEPTest extends TestDriver {
 			saveCounts("employee");
 		}
 		catch(IOException e){
+			isSuccess = false;
 			e.printStackTrace();
 		}
 		finally {
@@ -226,6 +264,7 @@ public class QEPTest extends TestDriver {
 				}
 			}
 			catch (IOException e) {
+				isSuccess = false;
 				e.printStackTrace();
 			}
 		}
@@ -266,6 +305,7 @@ public class QEPTest extends TestDriver {
 			saveCounts("department");
 		}
 		catch(IOException e){
+			isSuccess = false;
 			e.printStackTrace();
 		}
 		finally {
@@ -275,8 +315,10 @@ public class QEPTest extends TestDriver {
 				}
 			}
 			catch (IOException e) {
+				isSuccess = false;
 				e.printStackTrace();
 			}
 		}
+		return isSuccess;
 	}
 }
