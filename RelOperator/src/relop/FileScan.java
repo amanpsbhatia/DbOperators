@@ -5,6 +5,7 @@ import java.io.File;
 import global.GlobalConst;
 import global.PageId;
 import global.RID;
+import global.SearchKey;
 import heap.HeapFile;
 import heap.HeapScan;
 
@@ -41,7 +42,7 @@ public class FileScan extends Iterator {
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-	  scan.close();
+	  close();
 	  scan = file.openScan();
 	  lastRID = new RID(new PageId(GlobalConst.INVALID_PAGEID), -1);
   }
@@ -90,5 +91,9 @@ public class FileScan extends Iterator {
   public RID getLastRID() {
 	  return lastRID;
   }
-
+  
+  public HeapFile getFile(){
+	  return file;
+  }
+  
 } // public class FileScan extends Iterator
