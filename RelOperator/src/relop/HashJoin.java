@@ -144,8 +144,13 @@ public class HashJoin extends Iterator {
 	
 	@Override
 	public void explain(int depth) {
-		throw new UnsupportedOperationException("Not implemented");
-		
+		for (int i=0; i <= depth; i++){
+			  System.out.print("\t");
+		  }
+		  System.out.print("HashJoin");
+		  System.out.println();
+		  outer.explain(depth+1);
+		  inner.explain(depth+1);				
 	}
 
 	@Override

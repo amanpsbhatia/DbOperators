@@ -117,7 +117,10 @@ public class QEPTest extends TestDriver {
 		saveCounts(null);
 		FileScan scan = new FileScan(s_employee, employee);
 		Projection pro = new Projection(scan, 0,1,2);
-		pro.execute();
+		System.out.println("\n The query plan looks like : \n");
+		pro.explain(0);
+		System.out.println("-------------------------------------------------------------------\n");
+		pro.execute();		
 		saveCounts("qep-test1");
 		
 		System.out.println("\n\nTest 1 completed without exception");
@@ -136,6 +139,9 @@ public class QEPTest extends TestDriver {
 		FileScan scan = new FileScan(s_department, department);
 		Selection sel = new Selection(scan, preds);
 		Projection pro = new Projection(sel, 1);
+		System.out.println("\n The query plan looks like : \n");
+		pro.explain(0);
+		System.out.println("-------------------------------------------------------------------\n");
 		pro.execute();
 		saveCounts("qep-test2");
 		
@@ -155,6 +161,9 @@ public class QEPTest extends TestDriver {
 		
 		HashJoin join = new HashJoin(new FileScan(s_employee, employee), new IndexScan(s_department, ixdeptId, department), 4,5);
 		Projection pro = new Projection(join, 1,6,8);
+		System.out.println("\n The query plan looks like : \n");
+		pro.explain(0);
+		System.out.println("-------------------------------------------------------------------\n");
 		pro.execute();
 		saveCounts("qep-test3");
 		
@@ -175,6 +184,9 @@ public class QEPTest extends TestDriver {
 		HashJoin join = new HashJoin(new FileScan(s_employee, employee), new IndexScan(s_department, ixdeptId, department), 4,5);
 		Selection sel = new Selection(join, new Predicate(AttrOperator.GT, AttrType.FIELDNO, 3, AttrType.FIELDNO, 8));
 		Projection pro = new Projection(sel, 1);
+		System.out.println("\n The query plan looks like : \n");
+		pro.explain(0);
+		System.out.println("-------------------------------------------------------------------\n");
 		pro.execute();
 		saveCounts("qep-test4");
 

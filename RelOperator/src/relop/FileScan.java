@@ -35,7 +35,11 @@ public class FileScan extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
+	  for (int i=0; i <= depth; i++){
+		  System.out.print("\t");
+	  }
+	  System.out.print("FileScan");
+	  System.out.println();	  
   }
 
   /**

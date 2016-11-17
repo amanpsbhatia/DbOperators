@@ -29,8 +29,14 @@ public class Projection extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-//    TODO : Not sure what to do here?
-    throw new UnsupportedOperationException("Not implemented");
+
+	  for (int i=0; i <= depth; i++){
+		  System.out.print("\t");
+	  }
+	  System.out.print("Projection");
+	  System.out.println();
+	  iterator.explain(depth+1);
+	  
   }
 
   /**
